@@ -1,40 +1,41 @@
 local StarterGui = game:GetService("StarterGui")
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
+local RunService = game:GetService("RunService")
 
-local PLACE_ID = 2961583129
+local PLACE_ID = 2961583129  
 
 local function onButtonClick(option)
     if option == "Yes" then
         local player = Players.LocalPlayer
-
         if game.PlaceId == PLACE_ID then
             return
         end
         TeleportService:Teleport(PLACE_ID, player)
-        print("Teleporting you")
-    else
-        print("Dont Teleport")
     end
 end
-if game.PlaceId ~= PLACE_ID then
-local Bindable = Instance.new("BindableFunction")
-Bindable.OnInvoke = onButtonClick
 
-StarterGui:SetCore("SendNotification", {
-    Title = "Alert!";
-    Text = "Would you like to teleport?";
-    Duration = nil;  
-    Button1 = "Yes";  
-    Button2 = "No";  
-    Callback = Bindable;  
-})
+if game.PlaceId ~= PLACE_ID then
+    local Bindable = Instance.new("BindableFunction")
+    Bindable.OnInvoke = onButtonClick
+
+    StarterGui:SetCore("SendNotification", {
+        Title = "Alert!";
+        Text = "Would you like to teleport?";
+        Duration = 10;  
+        Button1 = "Yes";  
+        Button2 = "No";  
+        Callback = Bindable;  
+    })
+    return
+end
 
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-local Executor = identifyexecutor and identifyexecutor() or "Unknown" 
+local Executor = identifyexecutor and identifyexecutor() or "Unknown"
+
 local Window = Fluent:CreateWindow({
     Title = "Made by Jaimz Version: 1.0",
-    SubTitle = "Executor " ..Executor,
+    SubTitle = "Executor " .. Executor,
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
     Acrylic = true,
@@ -47,32 +48,27 @@ local Tabs = {
     Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
-Tab:AddButton({
-    Title = "Join my discord. Report Any Bugs",
+Tabs.Main:AddButton({
+    Title = "Join my Discord. Report Any Bugs",
     Callback = function()
         setclipboard("https://discord.gg/cuRJbSdrtZ")
     end
 })
 
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-
-local player = Players.LocalPlayer
-local connection
-
 local toggleTeleport = false
 local toggleMeteor = false
+local connection
 
 local function isHoldingBomb()
-    if not player.Character then return false end
-    local bomb = player.Character:FindFirstChild("Bomb")
+    if not Players.LocalPlayer.Character then return false end
+    local bomb = Players.LocalPlayer.Character:FindFirstChild("Bomb")
     return bomb and bomb:IsA("Tool")
 end
 
 local function getRandomPlayer()
     local otherPlayers = {}
     for _, p in ipairs(Players:GetPlayers()) do
-        if p ~= player and p.Character and not p.Character:FindFirstChild("Bomb") then
+        if p ~= Players.LocalPlayer and p.Character and not p.Character:FindFirstChild("Bomb") then
             table.insert(otherPlayers, p)
         end
     end
@@ -87,7 +83,7 @@ local function teleportToRandomPlayer()
     if not randomPlayer then return end
 
     local destination = randomPlayer.Character and randomPlayer.Character:FindFirstChild("HumanoidRootPart")
-    local character = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    local character = Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 
     if destination and character then
         character.CFrame = destination.CFrame
@@ -125,8 +121,7 @@ local function RemoveMeteors()
     end
 end
 
--- Teleport the bomb --
-local TeleportToggle = Tabs.Main:AddToggle("TeleportToggle", {
+Tabs.Main:AddToggle("TeleportToggle", {
     Title = "Enable Teleport",
     Description = "Toggle teleporting to random players when holding the bomb",
     Default = false,
@@ -136,8 +131,7 @@ local TeleportToggle = Tabs.Main:AddToggle("TeleportToggle", {
     end
 })
 
--- Meteor remove -- 
-local MeteorToggle = Tabs.Main:AddToggle("MeteorToggle", {
+Tabs.Main:AddToggle("MeteorToggle", {
     Title = "Remove Meteors",
     Description = "Destroys all meteors in the disaster folder",
     Default = false,
