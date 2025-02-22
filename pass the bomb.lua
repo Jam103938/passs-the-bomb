@@ -79,7 +79,6 @@ local function toggleScript(state)
     end
 end
 
--- Function to remove meteors
 local function RemoveMeteors()
     while toggleMeteor do
         local DisastersFolder = workspace:FindFirstChild("DisastersFolder")
