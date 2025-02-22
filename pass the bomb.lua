@@ -1,3 +1,36 @@
+local StarterGui = game:GetService("StarterGui")
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+
+local PLACE_ID = 2961583129
+
+local function onButtonClick(option)
+    if option == "Yes" then
+        local player = Players.LocalPlayer
+
+        if game.PlaceId == PLACE_ID then
+            return
+        end
+        TeleportService:Teleport(PLACE_ID, player)
+        print("Teleporting you")
+    else
+        print("Dont Teleport")
+    end
+end
+
+local Bindable = Instance.new("BindableFunction")
+Bindable.OnInvoke = onButtonClick
+
+StarterGui:SetCore("SendNotification", {
+    Title = "Alert!";
+    Text = "Would you like to teleport?";
+    Duration = nil;  
+    Button1 = "Yes";  
+    Button2 = "No";  
+    Callback = Bindable;  
+})
+
+
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local Executor = identifyexecutor and identifyexecutor() or "Unknown" 
 local Window = Fluent:CreateWindow({
