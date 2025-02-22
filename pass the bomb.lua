@@ -29,7 +29,7 @@ StarterGui:SetCore("SendNotification", {
     Button2 = "No";  
     Callback = Bindable;  
 })
-
+if game.PlaceId == PLACE_ID then
 
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local Executor = identifyexecutor and identifyexecutor() or "Unknown" 
