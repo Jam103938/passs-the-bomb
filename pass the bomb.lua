@@ -47,7 +47,7 @@ local Tabs = {
     Main = Window:AddTab({ Title = "Main", Icon = "" }),
     Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
-
+Window:SelectTab(1)
 Tabs.Main:AddButton({
     Title = "Join my Discord. Report Any Bugs",
     Callback = function()
@@ -57,7 +57,9 @@ Tabs.Main:AddButton({
 
 local toggleTeleport = false
 local toggleMeteor = false
+local toggleAutoCoin = false
 local connection
+local autoCoinConnection
 
 local function isHoldingBomb()
     if not Players.LocalPlayer.Character then return false end
@@ -121,6 +123,40 @@ local function RemoveMeteors()
     end
 end
 
+local function getNil(name, class)
+    for _, v in next, getnilinstances() do
+        if v.ClassName == class and v.Name == name then
+            return v
+        end
+    end
+end
+
+local function collectCoins()
+    while toggleAutoCoin do
+        local player = Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+
+        repeat task.wait() until character and character.Parent
+
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        local rootPart = character.PrimaryPart or character:FindFirstChild("HumanoidRootPart")
+        local folder = game:GetService("Workspace"):FindFirstChild("DisastersFolder")
+
+        if humanoid and rootPart and folder then
+            for _, coin in ipairs(folder:GetChildren()) do
+                if coin:IsA("Model") and coin.Name:match("^Coin%d+$") then
+                    local coinPrimaryPart = coin.PrimaryPart or coin:FindFirstChildWhichIsA("BasePart")
+                    if coinPrimaryPart and getNil("Attachment", "Attachment") then
+                        rootPart.CFrame = CFrame.new(coinPrimaryPart.Position)
+                        task.wait(0.6)
+                    end
+                end
+            end
+        end
+        task.wait(1)
+    end
+end
+
 Tabs.Main:AddToggle("TeleportToggle", {
     Title = "Enable Teleport",
     Description = "Toggle teleporting to random players when holding the bomb",
@@ -139,6 +175,18 @@ Tabs.Main:AddToggle("MeteorToggle", {
         toggleMeteor = state
         if toggleMeteor then
             spawn(RemoveMeteors)
+        end
+    end
+})
+
+Tabs.Main:AddToggle("AutoCoinToggle", {
+    Title = "Auto Collect Coins",
+    Description = "Automatically moves to collect all coins in the game when visible",
+    Default = false,
+    Callback = function(state)
+        toggleAutoCoin = state
+        if toggleAutoCoin then
+            spawn(collectCoins)
         end
     end
 })
